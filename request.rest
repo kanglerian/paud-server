@@ -1,0 +1,16 @@
+GET http://localhost:5000/users
+###
+GET http://localhost:5000/token
+###
+DELETE http://localhost:5000/logout
+###
+GET http://localhost:5000/protected
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJrYW5nbGVyaWFuIiwiZW1haWwiOiJrYW5nbGVyaWFuQGdtYWlsLmNvbSIsImlhdCI6MTY5MTUwNjUyNiwiZXhwIjoxNjkxNTA2NTc2fQ.JpbwUcJFCrCSglSBnOH62gSpFWUjuJ1d3_Pa5VZdpjs
+###
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+  "username": "kanglerian",
+  "password": "lerian123"
+}
