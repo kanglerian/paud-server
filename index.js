@@ -14,17 +14,10 @@ const port = 7654;
 // const verifyToken = require('./middleware/verifyToken');
 const { User } = require('./models');
 
-// app.use((req, res, next) => {
-//   res.setHeader('Access-Control-Allow-Origin', '*');
-//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-//   next();
-// });
 const corsOptions = {
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
     // Allow requests from specific origins
     const allowedOrigins = ['https://paud-client.vercel.app'];
     if (allowedOrigins.includes(origin)) {
@@ -34,7 +27,6 @@ const corsOptions = {
     }
   },
   credentials: true,
-  // optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
 app.use(cors(corsOptions));
