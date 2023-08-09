@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const cors = require('cors');
 const app = express();
-const port = 5000;
+const port = 7654;
 
 // const verifyToken = require('./middleware/verifyToken');
 const { User } = require('./models');
@@ -20,8 +20,24 @@ const { User } = require('./models');
 //   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 //   next();
 // });
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow requests from specific origins
+    const allowedOrigins = ['https://paud-client.vercel.app'];
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  // optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
 
-app.use(cors({ origin: '*', credentials: true }));
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb' }));
 app.use(cookieParser());
@@ -70,12 +86,23 @@ app.post('/login', async (req, res) => {
       id: user.id
     }
   })
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 3600000, // 1 hour
+    httpOnly: true, // Cookie can't be accessed by JavaScript
+    secure: true, // Send only over HTTPS
+    sameSite: 'none', // Allow cross-site requests
+  });
   res.json({ accessToken, refreshToken });
 });
 
 app.get('/set-cookie', (req, res) => {
-  res.cookie('username', 'john_doe');
-  res.send('Cookie username telah diatur');
+  res.cookie('username', 'endang', {
+    maxAge: 3600000, // 1 hour
+    httpOnly: true, // Cookie can't be accessed by JavaScript
+    secure: true, // Send only over HTTPS
+    sameSite: 'none', // Allow cross-site requests
+  });
+  res.send('Cookie set successfully');
 });
 
 app.get('/get-cookie', (req, res) => {
@@ -98,24 +125,23 @@ app.get('/protected', (req, res) => {
 });
 
 app.post('/refresh', async (req, res) => {
-  const { refreshToken } = req.cookies;
-  console.log(refreshToken);
-  // const user = await User.findOne({
-  //   where: {
-  //     refresh_token: refreshToken
-  //   }
-  // });
-  // if (!refreshToken || !user) {
-  //   return res.sendStatus(401);
-  // }
+  const refreshToken = req.cookies.refreshToken;
+  const user = await User.findOne({
+    where: {
+      refresh_token: refreshToken
+    }
+  });
+  if (!refreshToken || !user) {
+    return res.sendStatus(401);
+  }
 
-  // jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
-  //   if (err) {
-  //     return res.sendStatus(403);
-  //   }
-  //   const accessToken = jwt.sign({ id: user.id, username: user.username }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
-  //   res.json({ accessToken });
-  // });
+  jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) {
+      return res.sendStatus(403);
+    }
+    const accessToken = jwt.sign({ id: user.id, username: user.username }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+    res.json({ accessToken });
+  });
 });
 
 app.delete('/logout', async (req, res) => {
