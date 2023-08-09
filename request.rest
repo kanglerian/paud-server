@@ -5,7 +5,7 @@ GET http://localhost:5000/token
 DELETE http://localhost:5000/logout
 ###
 GET http://localhost:5000/protected
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJrYW5nbGVyaWFuIiwiZW1haWwiOiJrYW5nbGVyaWFuQGdtYWlsLmNvbSIsImlhdCI6MTY5MTUwNjUyNiwiZXhwIjoxNjkxNTA2NTc2fQ.JpbwUcJFCrCSglSBnOH62gSpFWUjuJ1d3_Pa5VZdpjs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJrYW5nbGVyaWFuIiwiZW1haWwiOiJrYW5nbGVyaWFuQGdtYWlsLmNvbSIsImlhdCI6MTY5MTU2ODMyNywiZXhwIjoxNjkxNTY4Mzc3fQ.AwRLxAXPlJt9BZHr0-Q6XbWX2OEqfjXl_jtDBthvo1Y
 ###
 POST http://localhost:5000/login
 Content-Type: application/json
