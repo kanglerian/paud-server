@@ -11,15 +11,12 @@ const cors = require('cors');
 const app = express();
 const port = 7654;
 
-// const verifyToken = require('./middleware/verifyToken');
 const { User } = require('./models');
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    // Allow requests from specific origins
-    const allowedOrigins = ['http://103.163.111.39:7654'];
+    const allowedOrigins = ['http://localhost:7654'];
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -78,74 +75,66 @@ app.post('/login', async (req, res) => {
       id: user.id
     }
   })
-  res.cookie('refreshToken', refreshToken, {
-    maxAge: 3600000, // 1 hour
-    httpOnly: true, // Cookie can't be accessed by JavaScript
-    secure: true, // Send only over HTTPS
-    sameSite: 'none', // Allow cross-site requests
-  });
   res.json({ accessToken, refreshToken });
 });
 
 app.get('/set-cookie', (req, res) => {
-  res.cookie('username', 'endang', {
-    maxAge: 3600000, // 1 hour
-    httpOnly: true, // Cookie can't be accessed by JavaScript
-    secure: false, // Send only over HTTPS
-    sameSite: 'none', // Allow cross-site requests
-  });
-  res.send('Cookie set successfully');
+  return res.json({ status: 200, token: 'lerian' });
 });
 
-app.get('/get-cookie', (req, res) => {
-  const username = req.cookies.username;
-  if (username) {
-    res.send(`Nilai cookie username: ${username}`);
-  } else {
-    res.send('Cookie username tidak ditemukan');
-  }
-});
-
-app.get('/protected', (req, res) => {
-  const token = req.headers.authorization.split(' ')[1];
-  jwt.verify(token, ACCESS_TOKEN_SECRET, (err, decoded) => {
+app.post('/protected', (req, res) => {
+  jwt.verify(req.body.token, ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      console.log('unauthorized')
+      return res.json({ message: 'Unauthorized' });
+    } else {
+      console.log('access grandted')
+      return res.json({ message: 'Access granted' });
     }
-    res.json({ message: 'Access granted', user: decoded });
   });
 });
+
+// app.post('/refresh', (req, res) => {
+//   jwt.verify(req.body.token, ACCESS_TOKEN_SECRET, (err, decoded) => {
+//     if (err) {
+//       console.log('unauthorized')
+//       return res.json({ message: 'Unauthorized' });
+//     } else {
+//       console.log('access grandted')
+//       return res.json({ message: 'Access granted' });
+//     }
+//   });
+// });
 
 app.post('/refresh', async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
+  const refreshToken = req.body.token;
   const user = await User.findOne({
     where: {
       refresh_token: refreshToken
     }
   });
   if (!refreshToken || !user) {
-    return res.sendStatus(401);
-  }
+    return res.json({ status: 'tidak oke' })
+  } 
 
   jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.json({ status: 'tidak oke' })
     }
     const accessToken = jwt.sign({ id: user.id, username: user.username }, ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
     res.json({ accessToken });
   });
 });
 
-app.delete('/logout', async (req, res) => {
-
-  const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) return res.sendStatus(204);
+app.post('/logout', async (req, res) => {
+  const refreshToken = req.body.token;
+  if (!refreshToken) return res.status(204).json({ status: 'tidak oke' });
   const user = await User.findOne({
     where: {
       refresh_token: refreshToken
     }
   });
-  if (!user) return res.sendStatus(204);
+  if (!user) return res.status(204).json({ status: 'tidak oke' });
   const userId = user.id
   await User.update({
     refresh_token: null
@@ -154,8 +143,7 @@ app.delete('/logout', async (req, res) => {
       id: userId
     }
   });
-  res.clearCookie('refreshToken');
-  return res.sendStatus(200);
+  return res.status(200).json({ status: 'oke' });
 })
 
 app.listen(port, () => {
