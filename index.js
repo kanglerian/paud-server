@@ -16,7 +16,7 @@ const { User } = require('./models');
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    const allowedOrigins = ['http://103.163.111.39:3000'];
+    const allowedOrigins = ['http://103.163.111.39:3000','https://paud-client.vercel.app'];
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -93,18 +93,6 @@ app.post('/protected', (req, res) => {
     }
   });
 });
-
-// app.post('/refresh', (req, res) => {
-//   jwt.verify(req.body.token, ACCESS_TOKEN_SECRET, (err, decoded) => {
-//     if (err) {
-//       console.log('unauthorized')
-//       return res.json({ message: 'Unauthorized' });
-//     } else {
-//       console.log('access grandted')
-//       return res.json({ message: 'Access granted' });
-//     }
-//   });
-// });
 
 app.post('/refresh', async (req, res) => {
   const refreshToken = req.body.token;
