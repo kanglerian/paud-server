@@ -16,7 +16,7 @@ const { User } = require('./models');
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-    const allowedOrigins = ['http://localhost:7654'];
+    const allowedOrigins = ['http://103.163.111.39:3000'];
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
