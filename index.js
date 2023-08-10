@@ -19,7 +19,7 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     // Allow requests from specific origins
-    const allowedOrigins = ['https://paud-client.vercel.app','https://api.politekniklp3i-tasikmalaya.ac.id'];
+    const allowedOrigins = ['http://103.163.111.39:7654'];
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -91,7 +91,7 @@ app.get('/set-cookie', (req, res) => {
   res.cookie('username', 'endang', {
     maxAge: 3600000, // 1 hour
     httpOnly: true, // Cookie can't be accessed by JavaScript
-    secure: true, // Send only over HTTPS
+    secure: false, // Send only over HTTPS
     sameSite: 'none', // Allow cross-site requests
   });
   res.send('Cookie set successfully');
